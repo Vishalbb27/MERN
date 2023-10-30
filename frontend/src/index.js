@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "bootstrap/dist/css/bootstrap.min.css";
+import ProductScreen from "./screens/ProductScreen";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -15,6 +16,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route path="/" index={true} element={<HomeScreen />} />
+      <Route path="/product/:id" index={true} element={<ProductScreen />} />
     </Route>
   )
 );
