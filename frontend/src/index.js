@@ -4,12 +4,15 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ProductScreen from "./screens/ProductScreen";
+import CartScreen from "./screens/CartScreen";
 import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
   RouterProvider,
 } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./store";
 import HomeScreen from "./screens/HomeScreen";
 
 const router = createBrowserRouter(
@@ -17,13 +20,16 @@ const router = createBrowserRouter(
     <Route path="/" element={<App />}>
       <Route path="/" index={true} element={<HomeScreen />} />
       <Route path="/product/:id" index={true} element={<ProductScreen />} />
+      <Route path="/cart" index={true} element={<CartScreen />} />
     </Route>
   )
 );
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );
 

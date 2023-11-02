@@ -15,6 +15,11 @@ const errorHandler = (err, req, res, next) => {
       message,
       stack: process.env.NODE_ENV === "production" ? "pancake" : err.stack,
     });
+  } else {
+    res.status(statusCode).json({
+      message,
+      stack:err.stack
+    });
   }
 };
 
