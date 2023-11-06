@@ -16,7 +16,7 @@ const orderSchema = mongoose.Schema(
         price: { type: String, required: true },
         products: {
           type: mongoose.Schema.Types.ObjectId,
-          required: true,
+
           ref: "Product",
         },
       },
@@ -50,6 +50,11 @@ const orderSchema = mongoose.Schema(
     shippingPrice: {
       type: Number,
       required: true,
+      default: 0.0,
+    },
+    totalPrice: {
+      type: Number,
+      requred: true,
       default: 0.0,
     },
     isPaid: {
