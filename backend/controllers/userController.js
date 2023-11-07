@@ -122,28 +122,98 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 //@route GET /api/users
 //@access Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-  res.send("get user profile");
+  const users = await User.find({});
+  res.status(200).json(users);
 });
 
 //@desc Delete users
 //@route DELETE /api/users/:id
 //@access Private/Admin
 const deleteUser = asyncHandler(async (req, res) => {
-  res.send("delete user");
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400);
+      throw new Error("Cannot delete admin user");
+    }
+    await User.deleteOne({ _id: user._id });
+    res.status(200).json({ message: "User deleted Successfully" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
 
 //@desc Delete users
 //@route GET /api/users/:id
 //@access Private/Admin
 const getUserrById = asyncHandler(async (req, res) => {
-  res.send("get user by id");
+  const user = await User.findById(req.params.id).select("-password");
+  if (user) {
+    res.status(200).json(user);
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
 
 //@desc Update users
 //@route PUT /api/users/:id
 //@access Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
-  res.send("update user");
+  const user = await User.findById(req.params.id);
+  console.log(user.password);
+
+  console.log(req.body);
+  if (user) {
+    const updateQuery = {
+      $set: {
+        name: req.body.name,
+        email: req.body.email,
+        isAdmin: req.body.isAdmin,
+      },
+    };
+    User.updateOne(
+      {
+        _id: user._id,
+      },
+      updateQuery
+    )
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // console.log(req.body.name);
+    // user.name = req.body.name;
+    // user.email = req.body.email;
+    // user.isAdmin = Boolean(req.body.isAdmin);
+
+    // console.log(user)
+    // user
+    //   .save()
+    //   .then((rep) => {
+    //     console.log(rep);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+    const updatedUser = await user.save();
+    console.log(updateUser);
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } else {
+    res.status(400);
+    throw new Error("User not found");
+  }
 });
 
 export {

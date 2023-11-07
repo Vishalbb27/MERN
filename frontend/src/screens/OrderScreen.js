@@ -16,6 +16,7 @@ import {
   useGetOrderDetailsQuery,
   usePayOrderMutation,
   useGetPayPalClientIdQuery,
+  useDeliveredOrderMutation,
 } from "../slices/orderApiSlice";
 import React from "react";
 import { toast } from "react-toastify";
@@ -31,7 +32,8 @@ const OrderScreen = () => {
     error,
   } = useGetOrderDetailsQuery(orderId);
   const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
-
+  const [deliveredOrder, { isLoading: loadingDeliver }] =
+    useDeliveredOrderMutation();
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
   const {
@@ -43,11 +45,9 @@ const OrderScreen = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    
     if (!errorPayPal && !loadingPayPal && paypal.clientId) {
-        console.log("in")
+      console.log("in");
       const loadPayPalScript = async () => {
-        
         paypalDispatch({
           type: "resetOptions",
           value: {
@@ -104,6 +104,16 @@ const OrderScreen = () => {
       .then((orderId) => {
         return orderId;
       });
+  };
+
+  const deliveredOrderHandler = async () => {
+    try {
+      await deliveredOrder(orderId);
+      refetch();
+      toast.success("Order delivered");
+    } catch (err) {
+      toast.error(err?.data?.message || err.message);
+    }
   };
 
   return isLoading ? (
@@ -224,6 +234,21 @@ const OrderScreen = () => {
                   )}
                 </ListGroup.Item>
               )}
+              {loadingDeliver && <Loader />}
+              {userInfo &&
+                userInfo.isAdmin &&
+                order.isPaid &&
+                !order.isDelivered && (
+                  <ListGroup.Item>
+                    <Button
+                      type="button"
+                      className="btn btn-block"
+                      onClick={deliveredOrderHandler}
+                    >
+                      Mark as delivered
+                    </Button>
+                  </ListGroup.Item>
+                )}
             </ListGroup>
           </Card>
         </Col>
