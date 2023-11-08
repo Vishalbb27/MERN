@@ -5,8 +5,14 @@ import Product from "../models/productModel.js";
 //@route GET/api/products
 //@access Public
 const getproducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
-  res.json(products);
+  const pageSize = 2;
+  const page = Number(req.query.pageNumber) || 1;
+  const count = await Product.countDocuments();
+  
+  const products = await Product.find({})
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
+  res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 
 //@desc Fetch a Products
@@ -113,8 +119,8 @@ const createProductReview = asyncHandler(async (req, res) => {
     product.rating =
       product.reviews.reduce((acc, review) => acc + review.rating, 0) /
       product.reviews.length;
-      await product.save();
-      res.status(201).json({message:'Review added'})
+    await product.save();
+    res.status(201).json({ message: "Review added" });
   } else {
     res.status(404);
     throw new Error("Resource Not Found");
