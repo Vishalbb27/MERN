@@ -22,10 +22,6 @@ const port = process.env.PORT || 5000;
 import connectDB from "./config/db.js";
 connectDB();
 
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
 app.use("/api/products", productRoutes); //It is directed to routes
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
@@ -36,6 +32,18 @@ app.get("/api/config/paypal", (req, res) =>
 
 const _dirname = path.resolve();
 app.use("/uploads", express.static(path.join(_dirname, "/uploads")));
+
+//For deployment
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(_dirname, "/frontend/build")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(_dirname, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+}
 
 app.use(notFound);
 app.use(errorHandler);
